@@ -2,6 +2,7 @@
   "palettes":
   {
     "default": ["red", "orange", "yellow", "green", "blue", "indigo", "violet"],
-    "Tomorrow Night": ["#c66", "#de935f", "#ee6", "#b5bd68", "#81a2be", "#b294bb", "#ff69b4", "#8a2be2"]
+    "Tomorrow Night": ["#c66", "#de935f", "#ee6", "#b5bd68", "#81a2be", "#b294bb", "#ff69b4", "#8a2be2"],
+    "Solarized (Light) (SL)": ["#dc322f", "#268bd2", "#cb4b16", "#b58900", "#2aa198", "#859900",  "#6c71c4"]
   }
 }

@@ -17,8 +17,8 @@ class Rainbowth(sublime_plugin.EventListener):
     if self.colors == cache.get(scheme_name, None):
       return
 
-    scheme_file = open(scheme_path, 'r')
-    scheme_xml = scheme_file.read().decode('utf-8')
+    scheme_file = open(scheme_path, 'r', encoding='utf-8')
+    scheme_xml = scheme_file.read()
 
     bg = re.search('background.+?g>(.+?)<', scheme_xml, re.DOTALL).group(1)
     bg = '#%06x' % max(1, (int(bg[1:], 16) - 1))
@@ -30,21 +30,22 @@ class Rainbowth(sublime_plugin.EventListener):
       rainbowth += fragment % (i, c)
 
     scheme_xml = re.sub('</array>', rainbowth + '<!---->\n\t</array>', scheme_xml)
-    scheme_file = open(scheme_path, 'w')
-    scheme_file.write(scheme_xml.encode('utf-8'))
+    scheme_file = open(scheme_path, 'w', encoding='utf-8')
+    scheme_file.write(scheme_xml)
     scheme_file.close()
     cache[scheme_name] = self.colors
     pickle.dump(cache, open(base_dir + '/Rainbowth/Rainbowth.cache', 'w'))
 
   def on_load(self, view):
-    file_scope = view.scope_name(0)
-    self.lispy = file_scope.split('.')[1].split(' ')[0] in ['lisp', 'scheme']
-    if self.lispy:
+    if self.lispy(view):
       self.update_colors(view)
       self.on_modified(view, True)
 
+  def lispy(self, view):
+    return os.path.basename(view.settings().get("syntax")).replace('.tmLanguage', '') in ["Clojure", "Lisp"]
+
   def on_modified(self, view, load = False):
-    if not self.lispy:
+    if not self.lispy(view):
       return
 
     key = view.substr(view.sel()[0].begin() - 1)
@@ -65,7 +66,7 @@ class Rainbowth(sublime_plugin.EventListener):
     parens = [(sublime.Region(i + block_start, i + block_start + 1), c)
       for i, c in enumerate(source[block_start:block_end]) if c in '()']
 
-    level, depths = 0, [[sublime.Region(-1, 0)] for i in xrange(len(self.colors))]
+    level, depths = 0, [[sublime.Region(-1, 0)] for i in range(len(self.colors))]
     for p in parens:
       level += p[1] == ')' and -1 or 0
       depths[level % len(self.colors)].append(p[0])
